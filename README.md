@@ -11,5 +11,5 @@ Our project can be broken up into several steps:
 4. Deployment
 
 
-Team: Ishita Gupta, Nitin Maddi, Avaneen Pinninti
+Team: Ishita Gupta, Nitin Maddi, Avaneen Pinninti  
 Meriel von Stein's GitHub was used as a resource for this project: https://github.com/MissMeriel/ROSbot_data_collection/tree/master
