@@ -1,38 +1,30 @@
+
+
+
+# Augmenting Data
+We had two main augmentation files  ``augment.ipynb`` and ``augment_attempt_2.ipynb`` 
+The first of which, ``augment.ipynb`` is to be used on images that have been split from the default camera output of left and right
+This file will flip, blur and change the brightness of an image if the image was belonged to a turn. This first attempt at augmentation was 
+a way of dealing with extremely unbalanced data, as we were driving in a completely straight path at this point of time. This helped balanced the data, 
+but a slight drift would cause our model to have no chance of recovering
+
+Our next augmentation file ``augment_attempt_2.ipynb`` was a supplement to our data collection methodology. After driving the S pattern, we saw that there were 
+still many flaws that caused our robot to crash into the wall. While we were gathering more natural turn data, we were teaching the robot incorrect behavior. This is because during the S pattern, we would be turning into the wall, which was teaching the robot that turning into the wall was good. Instead, we wanted to teach it to turn the other way when looking at a wall, and to do this, we would have to negate the velocity while we were collecting data of the robot turning into the wall. So we decided to still drive the S pattern, but be able to recognize when the robot was turning towards the wall. To do this, we had an angular velocity (turn velocity) of magnitude 0.3 while driving towards the wall, and a magnitude of 0.8 when turning away from the wall. We were able to use this to negate the velocity while turning into walls, to tell our model to correct away from the wall rather than going toward a wall. This worked well in corridors, except at turns. The amount of turn data was negligible when compared to the overall amount of data, so the robot didn't learn to make turns well. To fix this issue, we implemented a trigger that would store a boolean indicating that our robot was doing a "real" turn rather than the S pattern. This allowed us to augment/multiply these turn images to help the model better learn these situations. 
+
+Running these augmentation files will need you to:
+1. Change the path to the dataset that you wish to augment
+2. Change the name of the .csv file to data.csv, or change it in the path name
+3. Set the path of where you want to save the augmented dataset. 
+
+
+# DAVE2 Model Setup
+Ishita
+
+
 # Training a DAVE2 model
+This portion of the code assumes that you have collected 
 
 
+# Hyperparameters and Layers
+Ishita
 
-## Training on slurm
-1. Log into the department portal nodes: ``ssh computing-id@portal.cs.virginia.edu``
-2. Clone this repo (or your fork of this repo) into your home directory: ``git clone git@github.com:MissMeriel/ROSbot_data_collection.git``
-3. Navigate to the training directory: ``cd ~/ROSbot_data_collection/training``
-4. Create a python virtual environment and install requirements using the script provided: ``./install.sh``
-5. Create a dataset directory and copy your datasets to that directory: 
-```
-mkdir -p ~/ROSbot_data_collection/datasets
-scp -r username@remote:/path/to/dataset ~/ROSbot_data_collection/datasets
-```
-6. Edit the ``train.sh`` script to point to the dataset parent directory of the dataset you want to train on.
-7. Check what slurm gpu nodes are available via `sinfo`. You should see output similar to:
-```
-computing-id@portal0X:/p/sdbb$ sinfo
-PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-main*        up 4-00:00:00      2    mix lynx08,puma01
-main*        up 4-00:00:00      1  alloc hydro
-main*        up 4-00:00:00     28   idle affogato[01-10],cortado[01-10],lynx09,optane01,panther01,slurm[1-5]
-gpu          up 4-00:00:00     19    mix adriatic[01-04],cheetah[01,04],jaguar[01-06],lotus,lynx[05-06,11],ristretto01,sds[01-02]
-gpu          up 4-00:00:00     16   idle adriatic[05-06],affogato[11-15],cheetah[02-03],lynx[01-04,07,10,12]
-nolim        up 20-00:00:0      5   resv doppio[01-05]
-nolim        up 20-00:00:0      2   idle epona,heartpiece
-gnolim       up 20-00:00:0      3    mix ai[03,06,09]
-gnolim       up 20-00:00:0     14   idle ai[01-02,04-05,07-08,10],jinx[01-02],titanx[01-05]
-```
-Nodes marked `idle` mean they are available for you to launch jobs on them. Refer to the CS documentation here for more info: [CS computing info](https://www.cs.virginia.edu/wiki/doku.php?id=start).
-The CS grad student orientation to slurm presentation is helpful as well to get started with slurm: [link to slides](https://www.cs.virginia.edu/wiki/lib/exe/fetch.php?media=introtoslurm.pdf).
-
-7. Launch the job on slurm using one of the following configurations: 
-```
-sbatch -w ai01 -p gnolim --gres=gpu:1 --exclusive=user train.sh # for gnolim partition nodes
-sbatch -w adriatic05 -p gpu --gres=gpu:1 --exclusive=user train.sh # for gpu partition nodes
-```
-8. Check the job periodically to be sure it is progressing using the `squeue -u $USER` command, and check the log according to the `$SLURM_JOB_ID` in `slurm-$SLURM_JOB_ID.out`.
