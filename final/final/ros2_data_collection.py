@@ -1,3 +1,7 @@
+# This file stores images into a folder on a specified directory and velocity data to a CSV file
+# The CSV file has the velocities associated with the image taken at that time
+# The data_collection_launch.py must be run before this file
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -13,13 +17,10 @@ class DataCollectionNode(Node):
     def __init__(self):
 
         super().__init__('ros2_data_collection')
+        # Subscriptions
         self.subscription_twist = self.create_subscription(Twist, '/cmd_vel', self.vel_cmd_callback, 10)
         self.subscription_image = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
         self.subscription_joystick = self.create_subscription(Joy, '/joy', self.joy_callback, 10)
-
-        # self.subscription_image.add_on_set_parameters_callback(self.on_parameters_set).add_on_set_parameters_callback(self.on_parameters_set).add_on_change_callback(self.on_parameter_change)
-                
-        # self.subscription = self.create_subscription(Image, '/zed_camera/rgb/right_image', self.right_image_callback, 10)
 
         self.bridge = CvBridge()
         self.bridged_image = None
@@ -29,10 +30,10 @@ class DataCollectionNode(Node):
         self.angular_speed_z = 0.0
         self.is_turning = False
 
-        self.dataset_subdir = "/media/husarion/Avaneen128/training_data_7"
-        # self.dataset_subdir = "/media/husarion/Avaneen128/figure_eight"
+        self.dataset_subdir = "/media/husarion/Avaneen128/training_data" # Location of where you'd like your images and data.csv file to go
+        # We saved our data to an external USB so we could quickly transfer the data to another computer
 
-        #find the smallest value that hasn't been published to, and make that the new data{num}.csv file
+        # Find the smallest value that hasn't been published to, and make that the new data{num}.csv file
         self.collection_iter = 0
         self.dataset_path = self.dataset_subdir + "/data{}.csv".format(self.collection_iter)
 
@@ -40,6 +41,11 @@ class DataCollectionNode(Node):
             self.collection_iter += 1
             self.dataset_path = self.dataset_path = self.dataset_subdir + "/data{}.csv".format(self.collection_iter)
 
+        # The format of our CSV is a column for the image name (this is used later in training to associate an image to the angular velocity at that moment)
+        # A column for the linear speed
+        # A column for the angular speed
+        # A column for whether or not the robot is in a "hallway turn"
+            # This is used later in data augmentation to create more training instances where the robot is turning
         with open(self.dataset_path, 'a') as f:
             f.write("{},{},{},{}".format("image name",
                                       "linear_speed_x",  
@@ -47,7 +53,8 @@ class DataCollectionNode(Node):
                                     "is_turning"))
             f.write("\n")
 
-        #timer callback to save the image and publish the velocities at that moment
+
+        # Timer callback to save the image and publish the velocities at that moment
         self.timer = self.create_timer(0.2, self.timer_callback)
 
 
@@ -63,7 +70,7 @@ class DataCollectionNode(Node):
                                       self.angular_speed_z,
                                       self.is_turning))
             f.write("\n")
-        self.image_num += 1 #will need to diff image numbers if we are doing left and right cameras
+        self.image_num += 1
 
     def vel_cmd_callback(self, msg):
         self.linear_speed_x = msg.linear.x
@@ -71,7 +78,7 @@ class DataCollectionNode(Node):
 
     
     def image_callback(self, msg):
-        #might need to do some reversing, not too sure yet
+        # imgmsg_to_cv2 converts a ROS2 sensor_msgs/Image to a CV2 image which is then saved as a JPG
         self.bridged_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'passthrough')
         print("Should get image here")
     
@@ -82,19 +89,7 @@ class DataCollectionNode(Node):
             self.is_turning = False
         
 
-    # def on_parameters_set(self, parameters):
-    #     self.get_logger().info("Parameters set: {}".format(parameters))
-
-    # def on_parameter_change(self, parameters):
-    #     self.get_logger().info("Parameter change: {}".format(parameters))
-
-
-    # def right_image_callback(self, msg):
-    #     print("Should get right image here")
-
-
 def main(args=None):
-    print("hello mf")
     rclpy.init(args=args)
     node = DataCollectionNode()
     print("hola")

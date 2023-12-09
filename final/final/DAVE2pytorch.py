@@ -1,3 +1,5 @@
+# The Dave2v3 model is the model our team utilized to train and deploy our self-driving ROSbot
+
 import numpy as np
 import torch
 import torch.nn as nn
