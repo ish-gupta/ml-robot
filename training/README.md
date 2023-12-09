@@ -18,13 +18,21 @@ Running these augmentation files will need you to:
 
 
 # DAVE2 Model Setup
-Ishita
+Ishita - talk about requirements.txt, setting up the path of train_DAVE2 and stuff like that
 
 
 # Training a DAVE2 model
-This portion of the code assumes that you have collected 
+This portion of the code assumes that you have collected/augmented your data. You should have a directory that is for your datasets. Ours was named ``/datasets``. You can have as many datasets as you wish in this folder. The DatasetGenerator.py file should read and combine all of the datasets. Our overall dataset is split into a training set and a validation/test set, with 80% of the data being in the training set. This was helpful with seeing when our model was overfitting and when extra epochs were not helping the model anymore. Originally we were using the robustification part of the DatasetGenerator.py, but we stopped using that because that would modify images inplace, and in most cases we wanted to increase the number of images, rather than just changing them. This lead to us creating these to augmentation files. 
+
+To summarize the steps to train your own DAVE2 Model:
+1. Have data in a /datasets directory
+2. Change the paths in train_DAVE2 to where you want to store the best model weights
+3. Run ``train.sh`` or ``python3 train_DAVE2.py #PATH OF DATASET`` 
+4. Grab the best model from your folder after the training is finished and load it into the steering_NN
+
+If running on a local machine I suggest running ``caffeinate python3 train_DAVE2.py #PATH OF DATASET``, as this will keep your machine up and running even if the screen turns off. Another suggestion is that if your epochs are set to be too high, your "best" model might be too overfit, so you can take the best model at any epoch while the model is training. 
 
 
 # Hyperparameters and Layers
-Ishita
+Ishita - talk about the considerations we made when updating hyperparameters and layers
 

@@ -19,17 +19,17 @@ def apply_augmentation(image_path, linear_speed_x, angular_speed_z, output_folde
     
     # Check if augmentation is needed based on angular_speed_z
     if angular_speed_z < -0.016 or angular_speed_z > 0.025:
-        # Augmentation 1: Brightness change
+        # Brightness change
         augmented_image1 = augment_brightness(image)
         save_path1 = os.path.join(output_folder, os.path.basename(image_path).replace('.jpg', '_brightness.jpg'))
         cv2.imwrite(save_path1, augmented_image1)
         
-        # Augmentation 2: Flipping
+        # Flipping
         augmented_image2 = augment_flip(image)
         save_path2 = os.path.join(output_folder, os.path.basename(image_path).replace('.jpg', '_flip.jpg'))
         cv2.imwrite(save_path2, augmented_image2)
         
-        # Augmentation 3: Blurring
+        # Blurring
         augmented_image3 = augment_blur(image)
         save_path3 = os.path.join(output_folder, os.path.basename(image_path).replace('.jpg', '_blur.jpg'))
         cv2.imwrite(save_path3, augmented_image3)
@@ -42,15 +42,14 @@ def apply_augmentation(image_path, linear_speed_x, angular_speed_z, output_folde
                                      'linear_speed_x': [linear_speed_x, linear_speed_x, linear_speed_x],
                                      'angular_speed_z': [angular_speed_z, -angular_speed_z, angular_speed_z]})
 
-        # Concatenate to the original DataFrame
-        # df_augmented = pd.concat([df_original, df_augmented], ignore_index=True)
+
         df_augmented.to_csv(os.path.join(output_folder, 'data_augmented.csv'), index=False)
 
-# Read the original CSV file
+# Read the original CSV file 
 csv_file_path = 'data.csv'
 df_original = pd.read_csv(csv_file_path)
 
-# Specify the output folder for augmented images
+# Put the filepath to the output folder
 output_folder = 'output_folder'
 os.makedirs(output_folder, exist_ok=True)
 
