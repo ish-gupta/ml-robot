@@ -9,6 +9,7 @@ import os
 import os
 # from PIL import Image
 # import PIL
+
 import matplotlib.pyplot as plt
 # import csv
 from DatasetGenerator import MultiDirectoryDataSequence
@@ -30,8 +31,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('dataset', type=str, help='parent directory of training dataset')
-    parser.add_argument("--batch", type=int, default=2)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--batch", type=int, default=64)
+    parser.add_argument("--epochs", type=int, default=40)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--robustification", type=bool, default=False)
     parser.add_argument("--noisevar", type=int, default=15)
