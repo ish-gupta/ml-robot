@@ -4,30 +4,22 @@ import pandas as pd
 import matplotlib.image as mpimg
 from torch.autograd import Variable
 import os
-
-# import h5py
-import os
-# from PIL import Image
-# import PIL
-
 import matplotlib.pyplot as plt
-# import csv
 from DatasetGenerator import MultiDirectoryDataSequence
 import time
 import sys
-sys.path.append("../models")
+sys.path.append("../models") # to ensure our training code knows where to look for the model.py file
 from DAVE2pytorch import DAVE2PytorchModel, DAVE2v1, DAVE2v2, DAVE2v3, Epoch
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# from torch.utils import data
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from torchvision.transforms import Compose, ToPILImage, ToTensor, Resize, Lambda, Normalize
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-
+# To parse command line arguments for training the DAVE2v3 model and define the default values in case none are specified by the user
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('dataset', type=str, help='parent directory of training dataset')
@@ -40,16 +32,14 @@ def parse_arguments():
     args = parser.parse_args()
     return args
 
-
+# To characterize the distribution of steering values in the dataset.
 def characterize_steering_distribution(y_steering, generator):
     turning = []; straight = []
     for i in y_steering:
         if abs(i) < 0.1:
-            straight.append(abs(i))
+            straight.append(abs(i)) # storing data for straight paths
         else:
-            turning.append(abs(i))
-    # turning = [i for i in y_steering if i > 0.1]
-    # straight = [i for i in y_steering if i <= 0.1]
+            turning.append(abs(i)) # storing data for turns/drifts
     try:
         print("Moments of abs. val'd turning steering distribution:", generator.get_distribution_moments(turning))
         print("Moments of abs. val'd straight steering distribution:", generator.get_distribution_moments(straight))
@@ -58,13 +48,15 @@ def characterize_steering_distribution(y_steering, generator):
         print("len(turning)", len(turning))
         print("len(straight)", len(straight))
 
-
+# Main function for training the DAVE2v3 model
 def main():
     start_time = time.time()
     input_shape = (640, 360)
     model = DAVE2v3(input_shape=input_shape)
     args = parse_arguments()
     print(args)
+
+    # Loading data from the MultiDirectoryDataSequence defined in DatasetGenerator.py
     dataset = MultiDirectoryDataSequence(args.dataset, image_size=(model.input_shape[::-1]), transform=Compose([ToTensor()]),\
                                          robustification=args.robustification, noise_level=args.noisevar) #, Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]))
 
@@ -78,6 +70,7 @@ def main():
     test_size = len(dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
 
+    # Splitting data into train and test
     trainloader = DataLoader(train_dataset, batch_size=args.batch, shuffle=True, worker_init_fn=worker_init_fn)
     testloader = DataLoader(test_dataset, batch_size=args.batch, shuffle=False, worker_init_fn=worker_init_fn)
 
@@ -88,6 +81,7 @@ def main():
     print(f"{iteration=}")
     print(f"{device=}")
     model = model.to(device)
+
     # if loss doesnt level out after 20 epochs, either inc epochs or inc learning rate
     optimizer = optim.Adam(model.parameters(), lr=args.lr) #, betas=(0.9, 0.999), eps=1e-08)
     lowest_loss = 1e5
@@ -131,6 +125,7 @@ def main():
         print(f'Train MAE: {mae_train}')
         mse_train = mean_squared_error(true_values_train, predictions_train)
         print(f'Train MSE: {mse_train}')
+
         # Evaluation on the test dataset
         test_loss = 0.0
         predictions_test = []
@@ -167,26 +162,24 @@ def main():
         model_name = f"/mnt/c/Users/ishit/Documents/ROSbot_data_collection/model-{iteration}-epoch{epoch}.pt"
         print(f"Saving model to {model_name}")
         torch.save(model.state_dict(), model_name)
-        # if loss < 0.002:
-        #     print(f"Loss at {loss}; quitting training...")
-        #     break
+
         print(f"Finished {epoch=}")
     print('Finished Training')
 
     # save model
-    # torch.save(model.state_dict(), f'H:/GitHub/DAVE2-Keras/test{iteration}-weights.pt')
     model_name = f'/mnt/c/Users/ishit/Documents/ROSbot_data_collection/model-{iteration}.pt'
     torch.save(model.state_dict(), model_name)
 
-    # delete models from previous epochs
+    # Delete models from previous epochs
     # print("Deleting models from previous epochs...")
     # for epoch in range(args.epochs):
     #     os.remove(f"/mnt/c/Users/ishit/Documents/ROSbot_data_collection/model-{iteration}-epoch{epoch}.pt")
+    
     print(f"Saving model to {model_name}")
     print("All done :)")
     time_to_train=time.time() - start_time
     print("Time to train: {}".format(time_to_train))
-    # save metainformation about training
+    # Save metainformation about training in a text file
     with open(f'/mnt/c/Users/ishit/Documents/ROSbot_data_collection/model-{iteration}-metainfo.txt', "w") as f:
         f.write(f"{model_name=}\n"
                 f"total_samples={dataset.get_total_samples()}\n"
