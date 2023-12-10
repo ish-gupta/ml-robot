@@ -20,4 +20,6 @@ For driving an S: The driver does a "soft" turn towards the wall so we can later
 
 For taking a "hallway turn": The driver presses and holds the right bumper on the Xbox controller and can move in any direction of their choosing. Turns have to be executed extremely carefully, because they will be later augmented many times to help the network learn this behavior more consistently. So an error making a turn may have a detrimental impact to the model. We also held this turn toggle well in advance to the turn so we could reinforce the correct behaviors the network should take before a turn. 
 
+![Driving Problem](https://github.com/ish-gupta/ml-robot/blob/main/repo_imgs/IMG_1001.jpg)
+![Data Collection Solution](https://github.com/ish-gupta/ml-robot/blob/main/repo_imgs/IMG_1002.jpg)
 
