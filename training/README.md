@@ -16,6 +16,7 @@ Running these augmentation files will require you to:
 2. Change the name of the .csv file to data.csv, or change it in the path name
 3. Set the path of where you want to save the augmented dataset. 
 
+We also have an image_splitting.py file in our root folder since our robot captures slightly translated images from two cameras (left and right) and one might want to use those as separate images. However, we are not making use of this code currently because it might introduce errors while augmenting the images (particularly while flipping).
 
 # DAVE2 Model Setup
 Ensure that the ``train.sh`` points to the dataset parent directory of the dataset you want to train on. 
@@ -28,7 +29,7 @@ The architecture consists of convolutional layers followed by max-pooling layers
 More information about the DAVE2 architecture can be found here: [Nvidia's DAVE-2 system](https://arxiv.org/pdf/1604.07316v1.pdf)
 
 # Training a DAVE2 model
-This portion of the code assumes that you have collected/augmented your data. You should have a directory that is for your datasets. Ours was named ``/datasets``. You can have as many datasets as you wish in this folder. The DatasetGenerator.py file should read and combine all of the datasets. Our overall dataset is split into a training set and a validation/test set, with 80% of the data being in the training set. This helped see when our model was overfitting and when extra epochs were not helping the model anymore. Originally we were using the robustification part of the DatasetGenerator.py, but we stopped using that because that would modify images in place, and in most cases, we wanted to increase the number of images, rather than just changing them. This led to us creating these augmentation files. 
+This portion of the code assumes that you have collected/augmented your data. You should have a directory that is for your datasets. Ours was named ``/datasets``. You can have as many datasets as you wish in this folder. The DatasetGenerator.py file should read and combine all of the datasets. Our overall dataset is split into a training set and a validation/test set, with 80% of the data being in the training set. This helped us see when our model was overfitting and when extra epochs were not helping the model anymore. Originally we were using the robustification part of the DatasetGenerator.py, but we stopped using that because that would modify images in place, and in most cases, we wanted to increase the number of images, rather than just changing them. This led to us creating these augmentation files. 
 
 To summarize the steps to train your own DAVE2 Model:
 1. Have data in a /datasets directory
