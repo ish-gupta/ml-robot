@@ -10,6 +10,7 @@ Our project can be broken up into several steps:
 3. Model Training
 4. Deployment
 
+A demo for our project can be found [here](https://youtu.be/qPos7vMBse8))
 
 Team: Ishita Gupta, Nitin Maddi, Avaneen Pinninti  
 Meriel von Stein's GitHub was used as a resource for this project: https://github.com/MissMeriel/ROSbot_data_collection/tree/master
