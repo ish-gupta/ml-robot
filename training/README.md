@@ -81,3 +81,14 @@ We defined some default hyperparameters in our code using the parse_arguments fu
 2. Number of Epochs (``epochs``): A default value of 40 is used which is decided based on the convergence behavior observed during training. If convergence is observed earlier, we can use the .pt files that are generated after every epoch.
 3. Learning Rate (``lr``): The learning rate is set to 1e-3, a common starting point for many optimization tasks. This value is neither too high, risking convergence issues, nor too low, potentially causing slow convergence.
 4. Log Interval (``log_interval``): It is set to 50, indicating that training information is logged every 50 batches. This parameter helps in monitoring the training process and can be adjusted based on the desire for more or less frequent updates.
+
+# Model Performance
+The performance of the model over epochs was assessed through two metrics: Mean Squared Error (MSE) and Mean Absolute Error (MAE). MSE penalizes larger errors (outliers) more heavily, which can help us understand how our model is performing while taking hard turns since they tend to have a higher value of angular velocity. MAE considers all errors equally important and ensures that outliers do not have a disproportionately large impact.
+
+Our plots for the train MSE and MAE over epochs can be visualized as follows:
+![train_loss_plots](https://github.com/ish-gupta/ml-robot/assets/59526423/132d5caa-32ea-4deb-ac7f-14ce5a63084a)
+
+The test MSE and MAE can be visualized as follows:
+![test_loss_plots](https://github.com/ish-gupta/ml-robot/assets/59526423/84dde97d-31af-4ab4-86bd-8ac462ecde4f)
+
+In general, the loss metrics seem to be going down over time, for both the train and test data which is a strong indicator that our model is learning to predict the angular velocities well.
